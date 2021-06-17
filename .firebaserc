@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "fed-guild-de0d9"
+  },
+  "targets": {
+    "fed-guild-de0d9": {
+      "hosting": {
+        "landing-page": [
+          "fed-guild-de0d9"
+        ],
+        "portal": [
+          "fed-guild-portal"
+        ]
+      }
+    }
+  }
+}

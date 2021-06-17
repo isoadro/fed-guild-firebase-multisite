@@ -1,0 +1,62 @@
+name: Deploy things
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  buildLandingPage:
+    name: Build Landing Page
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: yarn
+        working-directory: ./landing-page
+      - run: yarn build
+        working-directory: ./landing-page
+      - uses: actions/upload-artifact@master
+        with:
+          name: landingPageDist
+          path: landing-page/dist
+  buildPortal:
+    name: Build Portal
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: yarn
+        working-directory: ./portal
+      - run: yarn build
+        working-directory: ./portal
+      - uses: actions/upload-artifact@master
+        with:
+          name: portalDist
+          path: portal/dist
+  deployment:
+    name: Deployment
+    needs:
+      - buildLandingPage
+      - buildPortal
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/download-artifact@master
+        with:
+          name: landingPageDist
+          path: landing-page/dist
+      - uses: actions/download-artifact@master
+        with:
+          name: portalDist
+          path: portal/dist
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
